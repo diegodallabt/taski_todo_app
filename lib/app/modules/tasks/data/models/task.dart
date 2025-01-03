@@ -1,25 +1,36 @@
 import 'package:equatable/equatable.dart';
 
 class Task extends Equatable {
+  final int? id;
   final String title;
-  final String description;
+  final String? description;
+  final bool isCompleted;
 
-  const Task({required this.title, required this.description});
+  const Task({
+    this.id,
+    required this.title,
+    this.description,
+    this.isCompleted = false,
+  });
 
-  factory Task.fromMap(Map<String, dynamic> map) {
+  factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
-      title: map['title'],
-      description: map['description'],
+      id: json['id'] as int?,
+      title: json['title'] as String,
+      description: json['description'] as String?,
+      isCompleted: json['isCompleted'] == 1,
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'title': title,
       'description': description,
+      'isCompleted': isCompleted ? 1 : 0,
     };
   }
 
   @override
-  List<Object> get props => [title, description];
+  List<Object?> get props => throw UnimplementedError();
 }

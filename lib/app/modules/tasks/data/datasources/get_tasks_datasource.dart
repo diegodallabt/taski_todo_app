@@ -1,4 +1,5 @@
+import '../models/task.dart';
+
 abstract class GetTasksDataSource {
-  Future<void> call();
+  Future<List<Task>> fetchTasks();
 }
-  

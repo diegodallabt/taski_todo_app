@@ -115,7 +115,9 @@ class TasksListPageState extends State<TasksListPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "You've got ${state.tasks.length} tasks to do.",
+                            state.tasks.isNotEmpty
+                                ? "You've got ${state.tasks.length} tasks to do."
+                                : "Create tasks to achieve more.",
                             style: useStyle(
                               TextStyle(
                                   color:
@@ -124,108 +126,180 @@ class TasksListPageState extends State<TasksListPage> {
                             ),
                           ),
                           Expanded(
-                            child: ListView.builder(
-                              itemCount: state.tasks.length,
-                              itemBuilder: (context, index) {
-                                final task = state.tasks[index];
-                                final isExpanded =
-                                    _expandedItems[index] ?? false;
+                            child: state.tasks.isNotEmpty
+                                ? ListView.builder(
+                                    itemCount: state.tasks.length,
+                                    itemBuilder: (context, index) {
+                                      final task = state.tasks[index];
+                                      final isExpanded =
+                                          _expandedItems[index] ?? false;
 
-                                return Container(
-                                  margin: EdgeInsets.only(bottom: 8),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0, horizontal: 12.0),
-                                    child: Row(
-                                      spacing: 10,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Transform.scale(
-                                          scale: 1.4,
-                                          child: Checkbox(
-                                            visualDensity:
-                                                VisualDensity.compact,
-                                            side: BorderSide(
-                                              width: 1.4,
-                                              color: const Color.fromARGB(
-                                                  120, 110, 133, 150),
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            value: false,
-                                            onChanged: (value) {},
+                                      return Container(
+                                        margin: EdgeInsets.only(bottom: 8),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0, horizontal: 12.0),
+                                          child: Row(
+                                            spacing: 10,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Transform.scale(
+                                                scale: 1.4,
+                                                child: Checkbox(
+                                                  visualDensity:
+                                                      VisualDensity.compact,
+                                                  side: BorderSide(
+                                                    width: 1.4,
+                                                    color: const Color.fromARGB(
+                                                        120, 110, 133, 150),
+                                                  ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  value: false,
+                                                  onChanged: (value) {},
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 8.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        task.title,
+                                                        style: useStyle(
+                                                          TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      if (isExpanded)
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 10.0),
+                                                          child: Text(
+                                                            task.description!,
+                                                            style: useStyle(
+                                                              TextStyle(
+                                                                color: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    110,
+                                                                    133,
+                                                                    150),
+                                                                fontSize: 14,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 6.0),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      _expandedItems[index] =
+                                                          !isExpanded;
+                                                    });
+                                                  },
+                                                  child: Icon(
+                                                    isExpanded
+                                                        ? Icons.expand_less
+                                                        : Icons.more_horiz,
+                                                    color: const Color.fromARGB(
+                                                        255, 201, 201, 201),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 8.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                      );
+                                    },
+                                  )
+                                : Center(
+                                    child: Column(
+                                      spacing: 25,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          'assets/empty.png',
+                                          width: 100,
+                                        ),
+                                        Text(
+                                          'You have no task listed.',
+                                          style: useStyle(
+                                            TextStyle(
+                                              color: const Color.fromARGB(
+                                                  255, 110, 133, 150),
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ),
+                                        InkWell(
+                                          highlightColor: Colors.transparent,
+                                          hoverColor: Colors.transparent,
+                                          splashColor: Colors.transparent,
+                                          focusColor: Colors.transparent,
+                                          onTap: () {},
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue.shade50,
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 12,
+                                              horizontal: 20,
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
                                               children: [
+                                                Icon(
+                                                  Icons.add,
+                                                  color: Colors.blue,
+                                                  size: 24,
+                                                ),
+                                                SizedBox(width: 8),
                                                 Text(
-                                                  task.title,
+                                                  'Create Task',
                                                   style: useStyle(
                                                     TextStyle(
+                                                      color: Colors.blue,
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
                                                     ),
                                                   ),
                                                 ),
-                                                if (isExpanded)
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 10.0),
-                                                    child: Text(
-                                                      task.description,
-                                                      style: useStyle(
-                                                        TextStyle(
-                                                          color: const Color
-                                                              .fromARGB(255,
-                                                              110, 133, 150),
-                                                          fontSize: 14,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
                                               ],
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 6.0),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                _expandedItems[index] =
-                                                    !isExpanded;
-                                              });
-                                            },
-                                            child: Icon(
-                                              isExpanded
-                                                  ? Icons.expand_less
-                                                  : Icons.more_horiz,
-                                              color: const Color.fromARGB(
-                                                  255, 201, 201, 201),
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                );
-                              },
-                            ),
                           ),
                         ],
                       );
