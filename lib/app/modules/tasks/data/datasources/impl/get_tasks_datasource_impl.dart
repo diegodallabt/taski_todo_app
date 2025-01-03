@@ -1,9 +1,11 @@
-import '../database/tasks_database.dart';
-import '../models/task.dart';
-import 'get_tasks_datasource.dart';
+import '../../database/tasks_database.dart';
+import '../../models/task.dart';
+import '../get_tasks_datasource.dart';
 
 class GetTasksDataSourceImpl implements GetTasksDataSource {
-  final db = TasksDatabase.instance;
+  final TasksDatabase db;
+
+  GetTasksDataSourceImpl(this.db);
 
   @override
   Future<List<Task>> fetchTasks() async {
@@ -11,5 +13,10 @@ class GetTasksDataSourceImpl implements GetTasksDataSource {
 
     final result = await database.query('tasks');
     return result.map((json) => Task.fromJson(json)).toList();
+  }
+
+  @override
+  Future<void> deleteAllTasks() async {
+    await db.deleteAllTasks();
   }
 }

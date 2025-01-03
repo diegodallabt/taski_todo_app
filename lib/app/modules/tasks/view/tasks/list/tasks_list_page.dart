@@ -3,9 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:taski/app/widgets/bottom_navbar.dart';
+import 'package:taski/app/widgets/button.dart';
+import 'package:taski/app/widgets/checkbox.dart';
 import 'package:taski/app/widgets/skeleton.dart';
 
+import '../../../../../utils/modal_utils.dart';
 import '../../../../../utils/use_style.dart';
+import '../../../../../widgets/header.dart';
 import '../../../viewmodel/tasks/list/bloc/tasks_bloc.dart';
 import '../../../viewmodel/tasks/list/bloc/tasks_event.dart';
 import '../../../viewmodel/tasks/list/bloc/tasks_state.dart';
@@ -30,50 +34,11 @@ class TasksListPageState extends State<TasksListPage> {
     return BlocProvider(
       create: (_) => Modular.get<TaskBloc>()..add(LoadTasks()),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.check_box, color: Colors.blue, size: 36),
-                  SizedBox(width: 8),
-                  Text(
-                    'Taski',
-                    style: useStyle(
-                      TextStyle(
-                        color: const Color.fromARGB(255, 43, 43, 43),
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                spacing: 14,
-                children: [
-                  Text(
-                    'John',
-                    style: useStyle(
-                      TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 17.5,
-                          color: const Color.fromARGB(255, 43, 43, 43)),
-                    ),
-                  ),
-                  CircleAvatar(
-                    backgroundColor: const Color.fromARGB(255, 228, 228, 228),
-                    foregroundColor: const Color.fromARGB(255, 228, 228, 228),
-                    backgroundImage:
-                        NetworkImage('https://avatar.iran.liara.run/public'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          title: Header(),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
@@ -149,24 +114,9 @@ class TasksListPageState extends State<TasksListPage> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Transform.scale(
-                                                scale: 1.4,
-                                                child: Checkbox(
-                                                  visualDensity:
-                                                      VisualDensity.compact,
-                                                  side: BorderSide(
-                                                    width: 1.4,
-                                                    color: const Color.fromARGB(
-                                                        120, 110, 133, 150),
-                                                  ),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                  ),
-                                                  value: false,
-                                                  onChanged: (value) {},
-                                                ),
-                                              ),
+                                                  scale: 1.4,
+                                                  child: CheckBoxComponent(
+                                                      onChanged: (value) {})),
                                               Expanded(
                                                 child: Padding(
                                                   padding: const EdgeInsets
@@ -257,46 +207,10 @@ class TasksListPageState extends State<TasksListPage> {
                                             ),
                                           ),
                                         ),
-                                        InkWell(
-                                          highlightColor: Colors.transparent,
-                                          hoverColor: Colors.transparent,
-                                          splashColor: Colors.transparent,
-                                          focusColor: Colors.transparent,
-                                          onTap: () {},
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.blue.shade50,
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                            ),
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 12,
-                                              horizontal: 20,
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  Icons.add,
-                                                  color: Colors.blue,
-                                                  size: 24,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text(
-                                                  'Create Task',
-                                                  style: useStyle(
-                                                    TextStyle(
-                                                      color: Colors.blue,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                        ButtonComponent(
+                                            onTap: () =>
+                                                showCreateTaskModal(context),
+                                            label: 'Create Task')
                                       ],
                                     ),
                                   ),
@@ -313,7 +227,9 @@ class TasksListPageState extends State<TasksListPage> {
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavbar(),
+        bottomNavigationBar: BottomNavbar(
+          onCreate: showCreateTaskModal,
+        ),
       ),
     );
   }

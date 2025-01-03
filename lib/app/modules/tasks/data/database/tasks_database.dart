@@ -37,6 +37,27 @@ class TasksDatabase {
     ''');
   }
 
+  Future<int> addTask(
+      String title, String description, bool isCompleted) async {
+    final db = await instance.database;
+
+    final id = await db.insert(
+      'tasks',
+      {
+        'title': title,
+        'description': description,
+        'isCompleted': isCompleted ? 1 : 0,
+      },
+    );
+    return id;
+  }
+
+  Future<void> deleteAllTasks() async {
+    final db = await instance.database;
+
+    await db.delete('tasks');
+  }
+
   Future close() async {
     final db = await instance.database;
 

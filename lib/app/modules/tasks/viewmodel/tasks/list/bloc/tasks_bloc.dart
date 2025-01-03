@@ -1,16 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../data/models/task.dart';
+import '../../../../data/repositories/add_tasks_repository.dart';
 import '../../../../data/repositories/get_tasks_repository.dart';
 import 'tasks_event.dart';
 import 'tasks_state.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
-  final GetTasksRepository repository;
+  final GetTasksRepository getRepository;
+  final AddTaskRepository addRepository;
 
-  TaskBloc(this.repository) : super(TaskInitial()) {
+  TaskBloc(this.getRepository, this.addRepository) : super(TaskInitial()) {
     on<LoadTasks>((event, emit) async {
       emit(TaskLoading());
 
       try {
+        // await getRepository.deleteAllTasks();
         await Future.delayed(const Duration(seconds: 2));
 
         // final tasks = [
@@ -41,11 +45,28 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         //           'By the time a prospect arrives at your signup page...'),
         // ];
 
-        final tasks = await repository.fetchTasks();
+        final tasks = await getRepository.fetchTasks();
 
         emit(TaskLoaded(tasks: tasks));
       } catch (e) {
         emit(TaskError('Failed to load tasks.'));
+      }
+    });
+
+    on<AddTask>((event, emit) async {
+      emit(TaskLoading());
+
+      try {
+        await addRepository.addTask(Task(
+          title: event.title,
+          description: event.description,
+          isCompleted: event.isCompleted,
+        ));
+
+        final tasks = await getRepository.fetchTasks();
+        emit(TaskLoaded(tasks: tasks));
+      } catch (e) {
+        emit(TaskError('Failed to add task.'));
       }
     });
   }

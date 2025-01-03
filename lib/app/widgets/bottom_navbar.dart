@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class BottomNavbar extends StatelessWidget {
-  const BottomNavbar({super.key});
+  final void Function(BuildContext context) onCreate;
+
+  const BottomNavbar({super.key, required this.onCreate});
 
   @override
   Widget build(BuildContext context) {
@@ -10,6 +12,11 @@ class BottomNavbar extends StatelessWidget {
       unselectedItemColor: Colors.grey,
       currentIndex: 0,
       type: BottomNavigationBarType.fixed,
+      onTap: (index) {
+        if (index == 1) {
+          onCreate(context);
+        }
+      },
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.view_list),
