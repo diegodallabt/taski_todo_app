@@ -1,4 +1,4 @@
-import '../../domain/repositories/get_tasks_repository.dart';
+import 'get_tasks_repository.dart';
 
 class GetTasksRepositoryImpl implements GetTasksRepository {
   @override

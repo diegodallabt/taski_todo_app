@@ -1,4 +1,4 @@
-import '../../data/datasources/get_tasks_datasource.dart';
+import 'get_tasks_datasource.dart';
 
 class GetTasksDataSourceImpl implements GetTasksDataSource {
   @override
