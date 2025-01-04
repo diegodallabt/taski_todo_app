@@ -58,6 +58,20 @@ class TasksDatabase {
     await db.delete('tasks');
   }
 
+  Future<List<Map<String, dynamic>>> fetchTasks(String query) async {
+    final db = await instance.database;
+
+    if (query.isEmpty) {
+      return await db.query('tasks');
+    }
+
+    return await db.query(
+      'tasks',
+      where: 'title LIKE ?',
+      whereArgs: ['%$query%'],
+    );
+  }
+
   Future close() async {
     final db = await instance.database;
 

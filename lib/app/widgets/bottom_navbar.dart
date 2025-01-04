@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 class BottomNavbar extends StatelessWidget {
+  final int currentIndex;
   final void Function(BuildContext context) onCreate;
 
-  const BottomNavbar({super.key, required this.onCreate});
+  const BottomNavbar(
+      {super.key, required this.onCreate, required this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       selectedItemColor: Colors.blue,
       unselectedItemColor: Colors.grey,
-      currentIndex: 0,
+      currentIndex: currentIndex,
       type: BottomNavigationBarType.fixed,
       onTap: (index) {
-        if (index == 1) {
-          onCreate(context);
+        switch (index) {
+          case 0:
+            Modular.to.navigate('/');
+            break;
+          case 1:
+            onCreate(context);
+            break;
+          case 2:
+            Modular.to.navigate('/search');
+            break;
         }
       },
       items: const [
