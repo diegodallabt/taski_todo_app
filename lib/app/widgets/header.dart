@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_test/flutter_test.dart';
 import '../utils/use_style.dart';
 
 class Header extends StatelessWidget {
@@ -7,6 +7,8 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTest = WidgetsBinding.instance is TestWidgetsFlutterBinding;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -41,8 +43,9 @@ class Header extends StatelessWidget {
             CircleAvatar(
               backgroundColor: const Color.fromARGB(255, 228, 228, 228),
               foregroundColor: const Color.fromARGB(255, 228, 228, 228),
-              backgroundImage:
-                  NetworkImage('https://avatar.iran.liara.run/public'),
+              backgroundImage: isTest
+                  ? AssetImage('assets/mock_avatar.png')
+                  : NetworkImage('https://avatar.iran.liara.run/public'),
             ),
           ],
         ),

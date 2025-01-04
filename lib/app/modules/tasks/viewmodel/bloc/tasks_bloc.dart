@@ -93,7 +93,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         final tasks = await getRepository.fetchTasksByDone(true);
         emit(TaskLoaded(tasks: tasks));
       } catch (e) {
-        emit(TaskError('Failed to delete task with id {$event.id}.'));
+        emit(TaskError('Failed to delete task with id ${event.id}.'));
       }
     });
   }
