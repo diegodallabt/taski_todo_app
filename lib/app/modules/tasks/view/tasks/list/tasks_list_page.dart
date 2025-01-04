@@ -8,6 +8,7 @@ import 'package:taski/app/widgets/skeleton.dart';
 
 import '../../../../../utils/modal_utils.dart';
 import '../../../../../utils/use_style.dart';
+import '../../../../../widgets/error.dart';
 import '../../../../../widgets/header.dart';
 import '../../../../../widgets/not_found.dart';
 import '../../../viewmodel/bloc/tasks_bloc.dart';
@@ -210,7 +211,7 @@ class TasksListPageState extends State<TasksListPage> {
                       ],
                     );
                   } else if (state is TaskError) {
-                    return Center(child: Text(state.message));
+                    return ErrorComponent(message: state.message);
                   }
                   return Center(
                     child: Column(

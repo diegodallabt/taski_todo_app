@@ -4,9 +4,11 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:taski/app/widgets/bottom_navbar.dart';
 import 'package:taski/app/widgets/checkbox.dart';
 import 'package:taski/app/widgets/skeleton.dart';
+import 'package:taski/app/widgets/textbutton.dart';
 
 import '../../../../../utils/modal_utils.dart';
 import '../../../../../utils/use_style.dart';
+import '../../../../../widgets/error.dart';
 import '../../../../../widgets/header.dart';
 import '../../../../../widgets/not_found.dart';
 import '../../../viewmodel/bloc/tasks_bloc.dart';
@@ -54,20 +56,11 @@ class TasksDonePageState extends State<TasksDonePage> {
                     ),
                   ),
                 ),
-                InkWell(
-                  highlightColor: Colors.transparent,
-                  splashColor: Colors.transparent,
+                TextButtonComponent(
                   onTap: () => Modular.get<TaskBloc>().add(DeleteAllTasks()),
-                  child: Text(
-                    'Delete all',
-                    style: useStyle(
-                      TextStyle(
-                        color: Colors.redAccent,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  color: Colors.redAccent,
+                  label: 'Delete all',
+                  fontSize: 17,
                 ),
               ],
             ),
@@ -165,7 +158,8 @@ class TasksDonePageState extends State<TasksDonePage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       NotFoundComponent(
-                                        message: "You have no task listed.",
+                                        message:
+                                            "You don't have any completed tasks.",
                                       ),
                                     ],
                                   ),
@@ -174,7 +168,7 @@ class TasksDonePageState extends State<TasksDonePage> {
                       ],
                     );
                   } else if (state is TaskError) {
-                    return Center(child: Text(state.message));
+                    return ErrorComponent(message: state.message);
                   }
                   return Center(
                     child: Column(
@@ -182,7 +176,8 @@ class TasksDonePageState extends State<TasksDonePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         NotFoundComponent(
-                          message: "You have no task listed.",
+                          message:
+                              "Complete the task to make it visible on the page.",
                         ),
                       ],
                     ),

@@ -20,7 +20,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       emit(TaskLoading());
 
       try {
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 1));
 
         final tasks = await getRepository.fetchTasksByDone(event.isCompleted);
 

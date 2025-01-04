@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:taski/app/widgets/bottom_navbar.dart';
 import 'package:taski/app/widgets/checkbox.dart';
+import 'package:taski/app/widgets/error.dart';
+import 'package:taski/app/widgets/searchbar.dart';
 import 'package:taski/app/widgets/skeleton.dart';
 
 import '../../../../../utils/modal_utils.dart';
@@ -21,28 +22,12 @@ class TasksSearchPage extends StatefulWidget {
 }
 
 class TasksSearchPageState extends State<TasksSearchPage> {
-  final FocusNode _focusNode = FocusNode();
-  final TextEditingController _textController = TextEditingController();
   final Map<int, bool> _expandedItems = {};
-  bool _hasFocus = false;
 
   @override
   void initState() {
     super.initState();
     Modular.get<TaskBloc>().add(SearchTasks(''));
-
-    _focusNode.addListener(() {
-      setState(() {
-        _hasFocus = _focusNode.hasFocus;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    _textController.dispose();
-    super.dispose();
   }
 
   @override
@@ -59,53 +44,7 @@ class TasksSearchPageState extends State<TasksSearchPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: _textController,
-              focusNode: _focusNode,
-              onChanged: (value) {
-                Modular.get<TaskBloc>().add(SearchTasks(value));
-              },
-              decoration: InputDecoration(
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    width: 2,
-                    color: Colors.blue,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                hintText: 'Search tasks',
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: _hasFocus
-                      ? Colors.blue
-                      : const Color.fromARGB(255, 110, 133, 150),
-                ),
-                suffixIcon: InkWell(
-                  highlightColor: Colors.transparent,
-                  splashColor: Colors.transparent,
-                  onTap: () {
-                    _textController.clear();
-                    Modular.get<TaskBloc>().add(SearchTasks(''));
-                  },
-                  child: Icon(
-                    FontAwesomeIcons.circleXmark,
-                    size: 20,
-                    color: const Color.fromARGB(255, 110, 133, 150),
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    width: 2,
-                    color: const Color.fromARGB(255, 110, 133, 150),
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                filled: true,
-                fillColor: const Color.fromARGB(255, 245, 245, 245),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              ),
-            ),
+            SearchBarComponent(),
             SizedBox(height: 16),
             Expanded(
               child: BlocBuilder<TaskBloc, TaskState>(
@@ -211,9 +150,7 @@ class TasksSearchPageState extends State<TasksSearchPage> {
                       },
                     );
                   } else if (state is TaskError) {
-                    return Center(
-                      child: Text(state.message),
-                    );
+                    return ErrorComponent(message: state.message);
                   }
                   return Center(
                     child: Column(

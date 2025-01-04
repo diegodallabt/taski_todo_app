@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:taski/app/widgets/textbutton.dart';
 
 import '../modules/tasks/viewmodel/bloc/tasks_bloc.dart';
 import '../modules/tasks/viewmodel/bloc/tasks_event.dart';
@@ -80,29 +81,22 @@ class Modal extends StatelessWidget {
               SizedBox(height: 16),
               Align(
                 alignment: Alignment.centerRight,
-                child: InkWell(
-                  onTap: () async {
-                    if (titleController.text.isNotEmpty &&
-                        descriptionController.text.isNotEmpty) {
-                      Modular.get<TaskBloc>().add(
-                        AddTask(
-                          title: titleController.text,
-                          description: descriptionController.text,
-                        ),
-                      );
+                child: TextButtonComponent(
+                    label: 'Create',
+                    fontWeight: FontWeight.bold,
+                    onTap: () async {
+                      if (titleController.text.isNotEmpty &&
+                          descriptionController.text.isNotEmpty) {
+                        Modular.get<TaskBloc>().add(
+                          AddTask(
+                            title: titleController.text,
+                            description: descriptionController.text,
+                          ),
+                        );
 
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text(
-                    'Create',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                        Navigator.pop(context);
+                      }
+                    }),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.2),
             ],
