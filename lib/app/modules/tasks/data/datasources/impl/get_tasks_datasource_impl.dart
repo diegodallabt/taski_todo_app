@@ -8,8 +8,8 @@ class GetTasksDataSourceImpl implements GetTasksDataSource {
   GetTasksDataSourceImpl(this.db);
 
   @override
-  Future<List<Task>> fetchTasks() async {
-    final result = await db.fetchAllTasks();
+  Future<List<Task>> fetchTasksByDone(bool isCompleted) async {
+    final result = await db.fetchTasksByDone(isCompleted);
     return result.map((json) => Task.fromJson(json)).toList();
   }
 

@@ -37,6 +37,13 @@ class TasksDatabase {
     ''');
   }
 
+  Future<List<Map<String, dynamic>>> fetchTasksByDone(bool done) async {
+    final db = await instance.database;
+
+    return await db
+        .query('tasks', where: 'isCompleted = ?', whereArgs: [done ? 1 : 0]);
+  }
+
   Future<int> addTask(
       String title, String description, bool isCompleted) async {
     final db = await instance.database;
@@ -66,26 +73,26 @@ class TasksDatabase {
   Future<void> deleteAllTasks() async {
     final db = await instance.database;
 
-    await db.delete('tasks');
+    await db.delete('tasks', where: 'isCompleted = ?', whereArgs: [1]);
   }
 
-  Future<List<Map<String, dynamic>>> fetchAllTasks() async {
+  Future<void> deleteTaskById(int id) async {
     final db = await instance.database;
 
-    return await db.query('tasks', where: 'isCompleted = 0');
+    await db.delete('tasks', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<List<Map<String, dynamic>>> searchTasks(String query) async {
     final db = await instance.database;
 
     if (query.isEmpty) {
-      return await db.query('tasks', where: 'isCompleted = 0');
+      return await db.query('tasks', where: 'isCompleted = ?', whereArgs: [0]);
     }
 
     return await db.query(
       'tasks',
-      where: 'title LIKE ? AND isCompleted = 0',
-      whereArgs: ['%$query%'],
+      where: 'title LIKE ? AND isCompleted = ?',
+      whereArgs: ['%$query%', 0],
     );
   }
 

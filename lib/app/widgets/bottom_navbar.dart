@@ -28,6 +28,9 @@ class BottomNavbar extends StatelessWidget {
           case 2:
             Modular.to.navigate('/search');
             break;
+          case 3:
+            Modular.to.navigate('/done');
+            break;
         }
       },
       items: const [

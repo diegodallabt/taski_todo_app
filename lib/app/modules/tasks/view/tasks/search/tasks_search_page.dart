@@ -9,9 +9,9 @@ import 'package:taski/app/widgets/skeleton.dart';
 import '../../../../../utils/modal_utils.dart';
 import '../../../../../widgets/header.dart';
 import '../../../../../widgets/not_found.dart';
-import '../../../viewmodel/tasks/bloc/tasks_bloc.dart';
-import '../../../viewmodel/tasks/bloc/tasks_event.dart';
-import '../../../viewmodel/tasks/bloc/tasks_state.dart';
+import '../../../viewmodel/bloc/tasks_bloc.dart';
+import '../../../viewmodel/bloc/tasks_event.dart';
+import '../../../viewmodel/bloc/tasks_state.dart';
 
 class TasksSearchPage extends StatefulWidget {
   const TasksSearchPage({super.key});
@@ -152,8 +152,6 @@ class TasksSearchPageState extends State<TasksSearchPage> {
                                   child: CheckBoxComponent(onChanged: (value) {
                                     Modular.get<TaskBloc>()
                                         .add(UpdateTask(id: task.id!));
-                                    Modular.get<TaskBloc>()
-                                        .add(SearchTasks(''));
                                   }),
                                 ),
                                 Expanded(

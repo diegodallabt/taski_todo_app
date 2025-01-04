@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:taski/app/widgets/bottom_navbar.dart';
-import 'package:taski/app/widgets/button.dart';
 import 'package:taski/app/widgets/checkbox.dart';
 import 'package:taski/app/widgets/skeleton.dart';
 
@@ -14,20 +13,18 @@ import '../../../viewmodel/bloc/tasks_bloc.dart';
 import '../../../viewmodel/bloc/tasks_event.dart';
 import '../../../viewmodel/bloc/tasks_state.dart';
 
-class TasksListPage extends StatefulWidget {
-  const TasksListPage({super.key});
+class TasksDonePage extends StatefulWidget {
+  const TasksDonePage({super.key});
 
   @override
-  TasksListPageState createState() => TasksListPageState();
+  TasksDonePageState createState() => TasksDonePageState();
 }
 
-class TasksListPageState extends State<TasksListPage> {
-  final Map<int, bool> _expandedItems = {};
-
+class TasksDonePageState extends State<TasksDonePage> {
   @override
   void initState() {
     super.initState();
-    Modular.get<TaskBloc>().add(LoadTasks(isCompleted: false));
+    Modular.get<TaskBloc>().add(LoadTasks(isCompleted: true));
   }
 
   @override
@@ -44,59 +41,56 @@ class TasksListPageState extends State<TasksListPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            RichText(
-              text: TextSpan(
-                text: 'Welcome, ',
-                style: useStyle(
-                  TextStyle(
-                    color: const Color.fromARGB(255, 43, 43, 43),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Completed Tasks',
+                  style: useStyle(
+                    TextStyle(
+                      color: const Color.fromARGB(255, 43, 43, 43),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                children: [
-                  TextSpan(
-                    text: 'John.',
+                InkWell(
+                  highlightColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  onTap: () => Modular.get<TaskBloc>().add(DeleteAllTasks()),
+                  child: Text(
+                    'Delete all',
                     style: useStyle(
                       TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w600,
+                        color: Colors.redAccent,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 24),
             Expanded(
               child: BlocBuilder<TaskBloc, TaskState>(
                 bloc: Modular.get<TaskBloc>(),
                 builder: (context, state) {
                   if (state is TaskLoading) {
-                    return Skeleton();
+                    return Skeleton(
+                      onlyTasksSkeleton: true,
+                    );
                   } else if (state is TaskLoaded) {
                     return Column(
                       spacing: 30,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          state.tasks.isNotEmpty
-                              ? "You've got ${state.tasks.length} tasks to do."
-                              : "Create tasks to achieve more.",
-                          style: useStyle(
-                            TextStyle(
-                                color: const Color.fromARGB(255, 110, 133, 150),
-                                fontSize: 15),
-                          ),
-                        ),
                         Expanded(
                           child: state.tasks.isNotEmpty
                               ? ListView.builder(
                                   itemCount: state.tasks.length,
                                   itemBuilder: (context, index) {
                                     final task = state.tasks[index];
-                                    final isExpanded =
-                                        _expandedItems[index] ?? false;
 
                                     return Container(
                                       margin: EdgeInsets.only(bottom: 8),
@@ -114,10 +108,8 @@ class TasksListPageState extends State<TasksListPage> {
                                             Transform.scale(
                                               scale: 1.4,
                                               child: CheckBoxComponent(
-                                                  onChanged: (value) {
-                                                Modular.get<TaskBloc>().add(
-                                                    UpdateTask(id: task.id!));
-                                              }),
+                                                  isDone: true,
+                                                  onChanged: (value) {}),
                                             ),
                                             Expanded(
                                               child: Padding(
@@ -134,32 +126,13 @@ class TasksListPageState extends State<TasksListPage> {
                                                         TextStyle(
                                                           fontSize: 16,
                                                           fontWeight:
-                                                              FontWeight.w600,
+                                                              FontWeight.w500,
+                                                          color: const Color
+                                                              .fromARGB(120,
+                                                              110, 133, 150),
                                                         ),
                                                       ),
                                                     ),
-                                                    if (isExpanded)
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                top: 10.0),
-                                                        child: Text(
-                                                          task.description ??
-                                                              '',
-                                                          style: useStyle(
-                                                            TextStyle(
-                                                              color: const Color
-                                                                  .fromARGB(
-                                                                  255,
-                                                                  110,
-                                                                  133,
-                                                                  150),
-                                                              fontSize: 14,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
                                                   ],
                                                 ),
                                               ),
@@ -170,17 +143,13 @@ class TasksListPageState extends State<TasksListPage> {
                                                       vertical: 6.0),
                                               child: GestureDetector(
                                                 onTap: () {
-                                                  setState(() {
-                                                    _expandedItems[index] =
-                                                        !isExpanded;
-                                                  });
+                                                  Modular.get<TaskBloc>().add(
+                                                      DeleteTask(task.id!));
                                                 },
                                                 child: Icon(
-                                                  isExpanded
-                                                      ? Icons.expand_less
-                                                      : Icons.more_horiz,
-                                                  color: const Color.fromARGB(
-                                                      255, 201, 201, 201),
+                                                  Icons.delete,
+                                                  color: Colors.redAccent,
+                                                  size: 22,
                                                 ),
                                               ),
                                             ),
@@ -197,11 +166,6 @@ class TasksListPageState extends State<TasksListPage> {
                                     children: [
                                       NotFoundComponent(
                                         message: "You have no task listed.",
-                                      ),
-                                      ButtonComponent(
-                                        onTap: () =>
-                                            showCreateTaskModal(context),
-                                        label: 'Create Task',
                                       ),
                                     ],
                                   ),
@@ -220,10 +184,6 @@ class TasksListPageState extends State<TasksListPage> {
                         NotFoundComponent(
                           message: "You have no task listed.",
                         ),
-                        ButtonComponent(
-                          onTap: () => showCreateTaskModal(context),
-                          label: 'Create Task',
-                        ),
                       ],
                     ),
                   );
@@ -234,7 +194,7 @@ class TasksListPageState extends State<TasksListPage> {
         ),
       ),
       bottomNavigationBar: BottomNavbar(
-        currentIndex: 0,
+        currentIndex: 3,
         onCreate: showCreateTaskModal,
       ),
     );

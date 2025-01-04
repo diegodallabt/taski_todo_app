@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
-import '../modules/tasks/viewmodel/tasks/list/bloc/tasks_bloc.dart';
-import '../modules/tasks/viewmodel/tasks/list/bloc/tasks_event.dart';
+import '../modules/tasks/viewmodel/bloc/tasks_bloc.dart';
+import '../modules/tasks/viewmodel/bloc/tasks_event.dart';
 import 'checkbox.dart';
 import 'textfield.dart';
 
@@ -90,8 +90,6 @@ class Modal extends StatelessWidget {
                           description: descriptionController.text,
                         ),
                       );
-
-                      Modular.get<TaskBloc>().add(SearchTasks(''));
 
                       Navigator.pop(context);
                     }

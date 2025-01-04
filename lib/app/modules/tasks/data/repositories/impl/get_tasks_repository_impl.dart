@@ -8,8 +8,8 @@ class GetTasksRepositoryImpl implements GetTasksRepository {
   GetTasksRepositoryImpl(this.dataSource);
 
   @override
-  Future<List<Task>> fetchTasks() async {
-    return await dataSource.fetchTasks();
+  Future<List<Task>> fetchTasksByDone(bool isCompleted) async {
+    return await dataSource.fetchTasksByDone(isCompleted);
   }
 
   @override
@@ -21,7 +21,6 @@ class GetTasksRepositoryImpl implements GetTasksRepository {
     }
   }
 
-  // temporary for testing
   @override
   Future<void> deleteAllTasks() async {
     return await dataSource.deleteAllTasks();
