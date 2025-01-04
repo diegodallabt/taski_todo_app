@@ -9,9 +9,13 @@ class GetTasksDataSourceImpl implements GetTasksDataSource {
 
   @override
   Future<List<Task>> fetchTasks() async {
-    final database = await db.database;
+    final result = await db.fetchAllTasks();
+    return result.map((json) => Task.fromJson(json)).toList();
+  }
 
-    final result = await database.query('tasks');
+  @override
+  Future<List<Task>> searchTasks(String query) async {
+    final result = await db.searchTasks(query);
     return result.map((json) => Task.fromJson(json)).toList();
   }
 

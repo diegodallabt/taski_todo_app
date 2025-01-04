@@ -12,6 +12,15 @@ class GetTasksRepositoryImpl implements GetTasksRepository {
     return await dataSource.fetchTasks();
   }
 
+  @override
+  Future<List<Task>> searchTasks(String query) async {
+    try {
+      return await dataSource.searchTasks(query);
+    } catch (e) {
+      throw Exception('Failed to fetch tasks: $e');
+    }
+  }
+
   // temporary for testing
   @override
   Future<void> deleteAllTasks() async {

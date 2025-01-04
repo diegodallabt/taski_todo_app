@@ -10,9 +10,9 @@ import '../../../../../utils/modal_utils.dart';
 import '../../../../../utils/use_style.dart';
 import '../../../../../widgets/header.dart';
 import '../../../../../widgets/not_found.dart';
-import '../../../viewmodel/tasks/list/bloc/tasks_bloc.dart';
-import '../../../viewmodel/tasks/list/bloc/tasks_event.dart';
-import '../../../viewmodel/tasks/list/bloc/tasks_state.dart';
+import '../../../viewmodel/tasks/bloc/tasks_bloc.dart';
+import '../../../viewmodel/tasks/bloc/tasks_event.dart';
+import '../../../viewmodel/tasks/bloc/tasks_state.dart';
 
 class TasksListPage extends StatefulWidget {
   const TasksListPage({super.key});
@@ -114,7 +114,10 @@ class TasksListPageState extends State<TasksListPage> {
                                             Transform.scale(
                                               scale: 1.4,
                                               child: CheckBoxComponent(
-                                                  onChanged: (value) {}),
+                                                  onChanged: (value) {
+                                                Modular.get<TaskBloc>().add(
+                                                    UpdateTask(id: task.id!));
+                                              }),
                                             ),
                                             Expanded(
                                               child: Padding(

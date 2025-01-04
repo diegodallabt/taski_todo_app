@@ -9,9 +9,9 @@ import 'package:taski/app/widgets/skeleton.dart';
 import '../../../../../utils/modal_utils.dart';
 import '../../../../../widgets/header.dart';
 import '../../../../../widgets/not_found.dart';
-import '../../../viewmodel/tasks/search/bloc/search_task_bloc.dart';
-import '../../../viewmodel/tasks/search/bloc/search_task_event.dart';
-import '../../../viewmodel/tasks/search/bloc/search_task_state.dart';
+import '../../../viewmodel/tasks/bloc/tasks_bloc.dart';
+import '../../../viewmodel/tasks/bloc/tasks_event.dart';
+import '../../../viewmodel/tasks/bloc/tasks_state.dart';
 
 class TasksSearchPage extends StatefulWidget {
   const TasksSearchPage({super.key});
@@ -29,7 +29,7 @@ class TasksSearchPageState extends State<TasksSearchPage> {
   @override
   void initState() {
     super.initState();
-    Modular.get<SearchTaskBloc>().add(SearchTasks(''));
+    Modular.get<TaskBloc>().add(SearchTasks(''));
 
     _focusNode.addListener(() {
       setState(() {
@@ -63,7 +63,7 @@ class TasksSearchPageState extends State<TasksSearchPage> {
               controller: _textController,
               focusNode: _focusNode,
               onChanged: (value) {
-                Modular.get<SearchTaskBloc>().add(SearchTasks(value));
+                Modular.get<TaskBloc>().add(SearchTasks(value));
               },
               decoration: InputDecoration(
                 focusedBorder: OutlineInputBorder(
@@ -85,7 +85,7 @@ class TasksSearchPageState extends State<TasksSearchPage> {
                   splashColor: Colors.transparent,
                   onTap: () {
                     _textController.clear();
-                    Modular.get<SearchTaskBloc>().add(SearchTasks(''));
+                    Modular.get<TaskBloc>().add(SearchTasks(''));
                   },
                   child: Icon(
                     FontAwesomeIcons.circleXmark,
@@ -108,14 +108,14 @@ class TasksSearchPageState extends State<TasksSearchPage> {
             ),
             SizedBox(height: 16),
             Expanded(
-              child: BlocBuilder<SearchTaskBloc, SearchTaskState>(
-                bloc: Modular.get<SearchTaskBloc>(),
+              child: BlocBuilder<TaskBloc, TaskState>(
+                bloc: Modular.get<TaskBloc>(),
                 builder: (context, state) {
-                  if (state is SearchTaskLoadingState) {
+                  if (state is TaskLoading) {
                     return Skeleton(
                       onlyTasksSkeleton: true,
                     );
-                  } else if (state is SearchTaskLoadedState) {
+                  } else if (state is TaskLoaded) {
                     final tasks = state.tasks;
                     if (tasks.isEmpty) {
                       return Center(
@@ -148,9 +148,14 @@ class TasksSearchPageState extends State<TasksSearchPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Transform.scale(
-                                    scale: 1.4,
-                                    child: CheckBoxComponent(
-                                        onChanged: (value) {})),
+                                  scale: 1.4,
+                                  child: CheckBoxComponent(onChanged: (value) {
+                                    Modular.get<TaskBloc>()
+                                        .add(UpdateTask(id: task.id!));
+                                    Modular.get<TaskBloc>()
+                                        .add(SearchTasks(''));
+                                  }),
+                                ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -207,7 +212,7 @@ class TasksSearchPageState extends State<TasksSearchPage> {
                         );
                       },
                     );
-                  } else if (state is SearchTaskErrorState) {
+                  } else if (state is TaskError) {
                     return Center(
                       child: Text(state.message),
                     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CheckBoxComponent extends StatelessWidget {
-  final Function(bool) onChanged;
+  final ValueChanged<bool?>? onChanged;
 
   const CheckBoxComponent({super.key, required this.onChanged});
 
@@ -17,7 +17,7 @@ class CheckBoxComponent extends StatelessWidget {
         borderRadius: BorderRadius.circular(5),
       ),
       value: false,
-      onChanged: (value) {},
+      onChanged: onChanged,
     );
   }
 }

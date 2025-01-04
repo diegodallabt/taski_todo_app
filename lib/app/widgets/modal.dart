@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 import '../modules/tasks/viewmodel/tasks/list/bloc/tasks_bloc.dart';
 import '../modules/tasks/viewmodel/tasks/list/bloc/tasks_event.dart';
@@ -7,11 +7,10 @@ import 'checkbox.dart';
 import 'textfield.dart';
 
 class Modal extends StatelessWidget {
-  final BuildContext blocContext;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
-  Modal({super.key, required this.blocContext});
+  Modal({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -85,12 +84,14 @@ class Modal extends StatelessWidget {
                   onTap: () async {
                     if (titleController.text.isNotEmpty &&
                         descriptionController.text.isNotEmpty) {
-                      BlocProvider.of<TaskBloc>(blocContext).add(
+                      Modular.get<TaskBloc>().add(
                         AddTask(
                           title: titleController.text,
                           description: descriptionController.text,
                         ),
                       );
+
+                      Modular.get<TaskBloc>().add(SearchTasks(''));
 
                       Navigator.pop(context);
                     }

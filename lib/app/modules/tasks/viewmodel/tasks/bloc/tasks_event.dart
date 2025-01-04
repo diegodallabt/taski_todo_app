@@ -9,6 +9,17 @@ abstract class TaskEvent extends Equatable {
 
 class LoadTasks extends TaskEvent {}
 
+class UpdateTask extends TaskEvent {
+  final int id;
+
+  const UpdateTask({
+    required this.id,
+  });
+
+  @override
+  List<Object?> get props => [id];
+}
+
 class RefreshTasks extends TaskEvent {}
 
 class AddTask extends TaskEvent {
@@ -20,4 +31,13 @@ class AddTask extends TaskEvent {
 
   @override
   List<Object?> get props => [title, description, isCompleted];
+}
+
+class SearchTasks extends TaskEvent {
+  final String query;
+
+  const SearchTasks(this.query);
+
+  @override
+  List<Object?> get props => [query];
 }

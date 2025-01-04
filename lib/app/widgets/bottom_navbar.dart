@@ -4,9 +4,11 @@ import 'package:flutter_modular/flutter_modular.dart';
 class BottomNavbar extends StatelessWidget {
   final int currentIndex;
   final void Function(BuildContext context) onCreate;
-
-  const BottomNavbar(
-      {super.key, required this.onCreate, required this.currentIndex});
+  const BottomNavbar({
+    super.key,
+    required this.onCreate,
+    required this.currentIndex,
+  });
 
   @override
   Widget build(BuildContext context) {

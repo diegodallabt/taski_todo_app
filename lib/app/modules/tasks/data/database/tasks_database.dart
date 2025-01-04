@@ -46,10 +46,21 @@ class TasksDatabase {
       {
         'title': title,
         'description': description,
-        'isCompleted': isCompleted ? 1 : 0,
+        'isCompleted': 0,
       },
     );
     return id;
+  }
+
+  Future<void> updateTaskStatus(int id) async {
+    final db = await instance.database;
+
+    await db.update(
+      'tasks',
+      {'isCompleted': 1},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<void> deleteAllTasks() async {
@@ -58,16 +69,22 @@ class TasksDatabase {
     await db.delete('tasks');
   }
 
-  Future<List<Map<String, dynamic>>> fetchTasks(String query) async {
+  Future<List<Map<String, dynamic>>> fetchAllTasks() async {
+    final db = await instance.database;
+
+    return await db.query('tasks', where: 'isCompleted = 0');
+  }
+
+  Future<List<Map<String, dynamic>>> searchTasks(String query) async {
     final db = await instance.database;
 
     if (query.isEmpty) {
-      return await db.query('tasks');
+      return await db.query('tasks', where: 'isCompleted = 0');
     }
 
     return await db.query(
       'tasks',
-      where: 'title LIKE ?',
+      where: 'title LIKE ? AND isCompleted = 0',
       whereArgs: ['%$query%'],
     );
   }
