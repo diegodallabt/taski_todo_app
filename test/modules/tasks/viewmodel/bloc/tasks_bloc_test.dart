@@ -60,6 +60,8 @@ void main() {
                       isCompleted: false,
                     ),
                   ]);
+          when(() => getRepository.countTasks(false))
+              .thenAnswer((_) async => 1);
           return taskBloc;
         },
         act: (bloc) => bloc.add(const LoadTasks(isCompleted: false)),
@@ -73,7 +75,7 @@ void main() {
               description: 'Sample Description',
               isCompleted: false,
             ),
-          ]),
+          ], totalTasks: 1),
         ],
       );
 
@@ -106,6 +108,8 @@ void main() {
                   isCompleted: false,
                 ),
               ]);
+          when(() => getRepository.countTasks(false))
+              .thenAnswer((_) async => 1);
           return taskBloc;
         },
         act: (bloc) => bloc.add(const AddTask(
@@ -114,14 +118,17 @@ void main() {
         )),
         expect: () => [
           TaskLoading(),
-          TaskLoaded(tasks: [
-            Task(
-              id: 1,
-              title: 'New Task',
-              description: 'Description',
-              isCompleted: false,
-            ),
-          ]),
+          TaskLoaded(
+            tasks: [
+              Task(
+                id: 1,
+                title: 'New Task',
+                description: 'Description',
+                isCompleted: false,
+              ),
+            ],
+            totalTasks: 1,
+          ),
         ],
       );
 
@@ -156,19 +163,26 @@ void main() {
                       isCompleted: false,
                     ),
                   ]);
+          when(() => getRepository.countTasks(false))
+              .thenAnswer((_) async => 1);
           return taskBloc;
         },
         act: (bloc) => bloc.add(const SearchTasks('query')),
         expect: () => [
           TaskLoading(),
-          TaskLoaded(tasks: [
-            Task(
-              id: 1,
-              title: 'Search Task',
-              description: 'Description',
-              isCompleted: false,
-            ),
-          ]),
+          TaskLoaded(
+            tasks: [
+              Task(
+                id: 1,
+                title: 'Search Task',
+                description: 'Description',
+                isCompleted: false,
+              ),
+            ],
+            hasMore: false,
+            isLoadingMore: false,
+            totalTasks: 1,
+          ),
         ],
       );
 
@@ -194,12 +208,16 @@ void main() {
           when(() => deleteRepository.deleteTask(1)).thenAnswer((_) async {});
           when(() => getRepository.fetchTasksByDone(true))
               .thenAnswer((_) async => []);
+          when(() => getRepository.countTasks(true)).thenAnswer((_) async => 1);
           return taskBloc;
         },
         act: (bloc) => bloc.add(const DeleteTask(1)),
         expect: () => [
           TaskLoading(),
-          TaskLoaded(tasks: []),
+          TaskLoaded(
+            tasks: [],
+            totalTasks: 0,
+          ),
         ],
       );
 

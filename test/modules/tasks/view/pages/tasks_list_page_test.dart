@@ -54,7 +54,7 @@ void main() {
             title: 'Task 2',
             description: 'Description 2',
             isCompleted: true),
-      ]));
+      ], totalTasks: 2));
       when(() => mockTaskBloc.stream)
           .thenAnswer((_) => Stream.value(TaskLoaded(tasks: [
                 Task(
@@ -67,7 +67,7 @@ void main() {
                     title: 'Task 2',
                     description: 'Description 2',
                     isCompleted: true),
-              ])));
+              ], totalTasks: 2)));
 
       await tester.pumpWidget(
         MaterialApp.router(
