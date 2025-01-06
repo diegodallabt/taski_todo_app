@@ -1,5 +1,5 @@
 name: taski
-description: "A new Flutter project."
+description: "A To-Do list application fully developed in Flutter."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -61,7 +61,11 @@ dependencies:
   bloc_test: ^9.1.7
   mocktail: ^1.0.4
 
+  # splash screen
+  flutter_native_splash: ^2.4.4
+
 dev_dependencies:
+  flutter_launcher_icons: "^0.14.2"
   flutter_test:
     sdk: flutter
 
@@ -87,6 +91,8 @@ flutter:
   assets:
     - assets/empty.png
     - assets/mock_avatar.png
+    - assets/splash_logo.png
+    - assets/app_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
