@@ -52,8 +52,8 @@ Ensure you have the following installed on your system:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/diegodallabt/taski.git
-   cd taski
+   git clone https://github.com/diegodallabt/taski_todo_app.git
+   cd taski_todo_app
    ```
 
 2. Install dependencies:
