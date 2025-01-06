@@ -8,6 +8,7 @@ import 'package:taski/app/widgets/textbutton.dart';
 
 import '../../../../../utils/modal_utils.dart';
 import '../../../../../utils/use_style.dart';
+import '../../../../../widgets/button.dart';
 import '../../../../../widgets/error.dart';
 import '../../../../../widgets/header.dart';
 import '../../../../../widgets/not_found.dart';
@@ -23,10 +24,30 @@ class TasksDonePage extends StatefulWidget {
 }
 
 class TasksDonePageState extends State<TasksDonePage> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     Modular.get<TaskBloc>().add(LoadTasks(isCompleted: true));
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        final bloc = Modular.get<TaskBloc>();
+        final state = bloc.state;
+
+        if (state is TaskLoaded && state.hasMore && !state.isLoadingMore) {
+          bloc.add(LoadMoreTasks(isCompleted: true));
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -70,19 +91,35 @@ class TasksDonePageState extends State<TasksDonePage> {
                 bloc: Modular.get<TaskBloc>(),
                 builder: (context, state) {
                   if (state is TaskLoading) {
-                    return Skeleton(
-                      onlyTasksSkeleton: true,
-                    );
+                    return Skeleton(onlyTasksSkeleton: true);
                   } else if (state is TaskLoaded) {
                     return Column(
-                      spacing: 30,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        SizedBox(
+                          height: 16,
+                        ),
                         Expanded(
-                          child: state.tasks.isNotEmpty
+                          child: state.totalTasks != 0
                               ? ListView.builder(
-                                  itemCount: state.tasks.length,
+                                  controller: _scrollController,
+                                  itemCount: state.tasks.length +
+                                      (state.isLoadingMore ? 1 : 0),
                                   itemBuilder: (context, index) {
+                                    if (index == state.tasks.length &&
+                                        state.isLoadingMore) {
+                                      return Center(
+                                        child: SizedBox(
+                                          width: 15,
+                                          height: 15,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.blue,
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      );
+                                    }
+
                                     final task = state.tasks[index];
 
                                     return Container(
@@ -158,8 +195,12 @@ class TasksDonePageState extends State<TasksDonePage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       NotFoundComponent(
-                                        message:
-                                            "You don't have any completed tasks.",
+                                        message: "You have no task listed.",
+                                      ),
+                                      ButtonComponent(
+                                        onTap: () =>
+                                            showCreateTaskModal(context),
+                                        label: 'Create Task',
                                       ),
                                     ],
                                   ),

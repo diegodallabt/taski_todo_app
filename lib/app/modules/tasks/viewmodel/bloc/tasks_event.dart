@@ -27,8 +27,6 @@ class UpdateTask extends TaskEvent {
   List<Object?> get props => [id];
 }
 
-class RefreshTasks extends TaskEvent {}
-
 class AddTask extends TaskEvent {
   final String title;
   final String? description;
@@ -58,4 +56,22 @@ class DeleteTask extends TaskEvent {
 
   @override
   List<Object?> get props => [id];
+}
+
+class LoadMoreTasks extends TaskEvent {
+  final bool isCompleted;
+
+  const LoadMoreTasks({required this.isCompleted});
+
+  @override
+  List<Object?> get props => [isCompleted];
+}
+
+class LoadMoreSearchTasks extends TaskEvent {
+  final String query;
+
+  const LoadMoreSearchTasks(this.query);
+
+  @override
+  List<Object?> get props => [query];
 }

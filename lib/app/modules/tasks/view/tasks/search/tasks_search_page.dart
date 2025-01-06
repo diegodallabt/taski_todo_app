@@ -8,6 +8,7 @@ import 'package:taski/app/widgets/searchbar.dart';
 import 'package:taski/app/widgets/skeleton.dart';
 
 import '../../../../../utils/modal_utils.dart';
+import '../../../../../utils/use_style.dart';
 import '../../../../../widgets/header.dart';
 import '../../../../../widgets/not_found.dart';
 import '../../../viewmodel/bloc/tasks_bloc.dart';
@@ -23,11 +24,30 @@ class TasksSearchPage extends StatefulWidget {
 
 class TasksSearchPageState extends State<TasksSearchPage> {
   final Map<int, bool> _expandedItems = {};
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     Modular.get<TaskBloc>().add(SearchTasks(''));
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent) {
+        if (Modular.get<TaskBloc>().state is TaskLoaded) {
+          final state = Modular.get<TaskBloc>().state as TaskLoaded;
+          if (!state.isLoadingMore && state.hasMore) {
+            Modular.get<TaskBloc>().add(LoadMoreSearchTasks(''));
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -51,9 +71,7 @@ class TasksSearchPageState extends State<TasksSearchPage> {
                 bloc: Modular.get<TaskBloc>(),
                 builder: (context, state) {
                   if (state is TaskLoading) {
-                    return Skeleton(
-                      onlyTasksSkeleton: true,
-                    );
+                    return Skeleton(onlyTasksSkeleton: true);
                   } else if (state is TaskLoaded) {
                     final tasks = state.tasks;
                     if (tasks.isEmpty) {
@@ -69,8 +87,27 @@ class TasksSearchPageState extends State<TasksSearchPage> {
                       );
                     }
                     return ListView.builder(
-                      itemCount: tasks.length,
+                      controller: _scrollController,
+                      itemCount:
+                          state.tasks.length + (state.isLoadingMore ? 1 : 0),
                       itemBuilder: (context, index) {
+                        if (index == state.tasks.length &&
+                            state.isLoadingMore) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: Center(
+                              child: SizedBox(
+                                width: 15,
+                                height: 15,
+                                child: CircularProgressIndicator(
+                                  color: Colors.blue,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
                         final task = tasks[index];
                         final isExpanded = _expandedItems[index] ?? false;
 
@@ -103,9 +140,11 @@ class TasksSearchPageState extends State<TasksSearchPage> {
                                       children: [
                                         Text(
                                           task.title,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
+                                          style: useStyle(
+                                            TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
                                         ),
                                         if (isExpanded)
@@ -114,10 +153,12 @@ class TasksSearchPageState extends State<TasksSearchPage> {
                                                 top: 10.0),
                                             child: Text(
                                               task.description ?? '',
-                                              style: TextStyle(
-                                                color: const Color.fromARGB(
-                                                    255, 110, 133, 150),
-                                                fontSize: 14,
+                                              style: useStyle(
+                                                TextStyle(
+                                                  color: const Color.fromARGB(
+                                                      255, 110, 133, 150),
+                                                  fontSize: 14,
+                                                ),
                                               ),
                                             ),
                                           ),

@@ -23,8 +23,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         await Future.delayed(const Duration(seconds: 1));
 
         final tasks = await getRepository.fetchTasksByDone(event.isCompleted);
+        final totalTasks = await getRepository.countTasks(event.isCompleted);
 
-        emit(TaskLoaded(tasks: tasks));
+        emit(TaskLoaded(tasks: tasks, totalTasks: totalTasks));
       } catch (e) {
         emit(TaskError('Failed to load tasks.'));
       }
@@ -41,8 +42,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         ));
 
         final tasks = await getRepository.searchTasks('');
+        final totalTasks = await getRepository.countTasks(event.isCompleted);
 
-        emit(TaskLoaded(tasks: tasks));
+        emit(TaskLoaded(tasks: tasks, totalTasks: totalTasks));
       } catch (e) {
         emit(TaskError('Failed to add task. $e'));
       }
@@ -55,7 +57,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         await updateRepository.updateTaskStatus(event.id);
 
         final tasks = await getRepository.searchTasks('');
-        emit(TaskLoaded(tasks: tasks));
+        final totalTasks = await getRepository.countTasks(false);
+
+        emit(TaskLoaded(tasks: tasks, totalTasks: totalTasks));
       } catch (e) {
         emit(TaskError('Failed to update task.'));
       }
@@ -65,7 +69,13 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       emit(TaskLoading());
       try {
         final tasks = await getRepository.searchTasks(event.query);
-        emit(TaskLoaded(tasks: tasks));
+        final totalTasks = await getRepository.countTasks(false);
+
+        emit(TaskLoaded(
+          tasks: tasks,
+          totalTasks: totalTasks,
+          hasMore: tasks.length < totalTasks,
+        ));
       } catch (e) {
         emit(TaskError('Failed to search tasks.'));
       }
@@ -78,7 +88,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         await deleteRepository.deleteAllTasks();
 
         final tasks = await getRepository.fetchTasksByDone(true);
-        emit(TaskLoaded(tasks: tasks));
+        final totalTasks = await getRepository.countTasks(true);
+
+        emit(TaskLoaded(tasks: tasks, totalTasks: totalTasks));
       } catch (e) {
         emit(TaskError('Failed to delete all tasks.'));
       }
@@ -91,9 +103,83 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         await deleteRepository.deleteTask(event.id);
 
         final tasks = await getRepository.fetchTasksByDone(true);
-        emit(TaskLoaded(tasks: tasks));
+        final totalTasks = await getRepository.countTasks(true);
+
+        emit(TaskLoaded(tasks: tasks, totalTasks: totalTasks));
       } catch (e) {
         emit(TaskError('Failed to delete task with id ${event.id}.'));
+      }
+    });
+
+    on<LoadMoreTasks>((event, emit) async {
+      if (state is TaskLoaded) {
+        final currentState = state as TaskLoaded;
+
+        if (currentState.isLoadingMore || !currentState.hasMore) {
+          return;
+        }
+
+        final totalTasks = await getRepository.countTasks(event.isCompleted);
+
+        emit(TaskLoaded(
+          tasks: currentState.tasks,
+          hasMore: currentState.hasMore,
+          isLoadingMore: true,
+          totalTasks: totalTasks,
+        ));
+
+        try {
+          final newTasks = await getRepository.fetchTasksByDone(
+            event.isCompleted,
+            offset: currentState.tasks.length,
+            limit: 10,
+          );
+
+          final totalTasks = await getRepository.countTasks(event.isCompleted);
+
+          emit(TaskLoaded(
+            tasks: currentState.tasks + newTasks,
+            hasMore: newTasks.isNotEmpty,
+            isLoadingMore: false,
+            totalTasks: totalTasks,
+          ));
+        } catch (e) {
+          emit(TaskError('Failed to load more tasks.'));
+        }
+      }
+    });
+
+    on<LoadMoreSearchTasks>((event, emit) async {
+      if (state is TaskLoaded) {
+        final currentState = state as TaskLoaded;
+
+        if (currentState.isLoadingMore || !currentState.hasMore) {
+          return;
+        }
+
+        emit(TaskLoaded(
+          tasks: currentState.tasks,
+          hasMore: currentState.hasMore,
+          isLoadingMore: true,
+          totalTasks: currentState.totalTasks,
+        ));
+
+        try {
+          final newTasks = await getRepository.searchTasks(
+            event.query,
+            offset: currentState.tasks.length,
+            limit: 10,
+          );
+
+          emit(TaskLoaded(
+            tasks: currentState.tasks + newTasks,
+            hasMore: newTasks.isNotEmpty,
+            isLoadingMore: false,
+            totalTasks: currentState.totalTasks,
+          ));
+        } catch (e) {
+          emit(TaskError('Failed to load more search tasks.'));
+        }
       }
     });
   }

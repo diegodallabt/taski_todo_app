@@ -37,11 +37,30 @@ class TasksDatabase {
     ''');
   }
 
-  Future<List<Map<String, dynamic>>> fetchTasksByDone(bool done) async {
+  Future<List<Map<String, dynamic>>> fetchTasksByDone(bool done,
+      {int offset = 0, int limit = 10}) async {
     final db = await instance.database;
 
-    return await db
-        .query('tasks', where: 'isCompleted = ?', whereArgs: [done ? 1 : 0]);
+    final result = await db.query(
+      'tasks',
+      where: 'isCompleted = ?',
+      whereArgs: [done ? 1 : 0],
+      limit: limit,
+      offset: offset,
+    );
+
+    return result;
+  }
+
+  Future<int> countTasks(bool done) async {
+    final db = await instance.database;
+
+    final result = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT COUNT(*) FROM tasks WHERE isCompleted = ?',
+      [done ? 1 : 0],
+    ));
+
+    return result ?? 0;
   }
 
   Future<int> addTask(
@@ -82,17 +101,26 @@ class TasksDatabase {
     await db.delete('tasks', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<List<Map<String, dynamic>>> searchTasks(String query) async {
+  Future<List<Map<String, dynamic>>> searchTasks(String query,
+      {int offset = 0, int limit = 10}) async {
     final db = await instance.database;
 
     if (query.isEmpty) {
-      return await db.query('tasks', where: 'isCompleted = ?', whereArgs: [0]);
+      return await db.query(
+        'tasks',
+        where: 'isCompleted = ?',
+        whereArgs: [0],
+        limit: limit,
+        offset: offset,
+      );
     }
 
     return await db.query(
       'tasks',
       where: 'title LIKE ? AND isCompleted = ?',
       whereArgs: ['%$query%', 0],
+      limit: limit,
+      offset: offset,
     );
   }
 

@@ -24,11 +24,30 @@ class TasksListPage extends StatefulWidget {
 
 class TasksListPageState extends State<TasksListPage> {
   final Map<int, bool> _expandedItems = {};
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     Modular.get<TaskBloc>().add(LoadTasks(isCompleted: false));
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        final bloc = Modular.get<TaskBloc>();
+        final state = bloc.state;
+
+        if (state is TaskLoaded && state.hasMore && !state.isLoadingMore) {
+          bloc.add(LoadMoreTasks(isCompleted: false));
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,7 +101,7 @@ class TasksListPageState extends State<TasksListPage> {
                       children: [
                         Text(
                           state.tasks.isNotEmpty
-                              ? "You've got ${state.tasks.length} tasks to do."
+                              ? "You've got ${state.totalTasks} tasks to do."
                               : "Create tasks to achieve more.",
                           style: useStyle(
                             TextStyle(
@@ -91,10 +110,26 @@ class TasksListPageState extends State<TasksListPage> {
                           ),
                         ),
                         Expanded(
-                          child: state.tasks.isNotEmpty
+                          child: state.totalTasks != 0
                               ? ListView.builder(
-                                  itemCount: state.tasks.length,
+                                  controller: _scrollController,
+                                  itemCount: state.tasks.length +
+                                      (state.isLoadingMore ? 1 : 0),
                                   itemBuilder: (context, index) {
+                                    if (index == state.tasks.length &&
+                                        state.isLoadingMore) {
+                                      return Center(
+                                        child: SizedBox(
+                                          width: 15,
+                                          height: 15,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.blue,
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      );
+                                    }
+
                                     final task = state.tasks[index];
                                     final isExpanded =
                                         _expandedItems[index] ?? false;
